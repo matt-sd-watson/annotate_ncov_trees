@@ -69,6 +69,27 @@ tr.df.labs <- as.data.frame(tr.df) %>%
 #   filter(isTip == "TRUE") %>%
 #   select(label)
 
+## PARKCED CODE: Annotate the 5 most prevalent countries/regions
+## IMPORTANT: Requires background Gisaid sequences that have normalized names
+
+# meta.df <- tr.df.labs %>%
+#   mutate(label.2 = str_split_fixed(tr.df.labs$label, "/", 4)[,1])
+# 
+# meta.df$all_label <- ifelse(grepl("PHLON", meta.df$label), "ON-PHO", meta.df$label.2)
+# 
+# # treat the countries as a factor for plotting
+# meta.df$label.2 <- as.factor(meta.df$label.2)
+# 
+# # find the most abundant countries and regions for annotation
+# regions <- as.data.frame(table(meta.df$label.2)) %>% arrange(-Freq)
+# 
+# # create a frame with the 4 most abundant regions and give each one a colour
+# cols <- c("#C31130", "blue", "dark green", "light blue", "dark red", "light green")
+# names(cols) <- c(as.character("ON-PHO"),as.character(regions[1:5,]$Var1))
+# 
+# meta.df$nml_lab <- paste("ON-PHL", str_split_fixed(meta.df$label, "PHLON|-SARS", 4)[,2],
+#                          str_split_fixed(meta.df$label, "PHLON|-SARS", 4)[,3], sep = "-")
+
 qc_pass$Date <- as.Date(qc_pass$Login_Date, format = "%d%B%Y")
 
 qc_pass <- qc_pass[!is.na(qc_pass$Date),]
