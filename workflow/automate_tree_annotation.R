@@ -81,7 +81,8 @@ tr.df.labs <- as.data.frame(tr.df) %>%
 # meta.df$label.2 <- as.factor(meta.df$label.2)
 # 
 # # find the most abundant countries and regions for annotation
-# regions <- as.data.frame(table(meta.df$label.2)) %>% arrange(-Freq)
+## exclude PHO sequences from being considered in regions
+# regions <- as.data.frame(table(meta.df$label.2)) %>% filter(!grepl("PHL", Var1)) %>% arrange(-Freq)
 # 
 # # create a frame with the 4 most abundant regions and give each one a colour
 # cols <- c("#C31130", "blue", "dark green", "light blue", "dark red", "light green")
