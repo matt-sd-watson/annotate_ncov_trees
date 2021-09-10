@@ -20,26 +20,15 @@
 # Specify the desired outputs using all
 # if the suer specifies the qc_list parameter, the annotation tree will be generated in pdf form using annotate_tree. If not, the workflow terminates with the tree rule
 
-if config["qc_list"]: 
-	rule all: 
-		input: 
-			gisaid_subset = expand(config["output_dir"] + "{lineages}/" + "gisaid_subset_filtered.fa", lineages = config["lineages"]),
-			pho_subset = expand(config["output_dir"] + "{lineages}/" + "pho_subset_filtered.fa", lineages = config["lineages"]),
-			merged = expand(config["output_dir"] + "{lineages}/" + "merged.fa", lineages = config["lineages"]),
-			gisaid_metadata = expand(config["output_dir"] + "{lineages}/" + "civet_data/" + "gisaid_subset_metadata.csv", lineages = config["lineages"]),
-			alignment = expand(config["output_dir"] + "{lineages}/" + "merged_aln.fasta", lineages = config["lineages"]),
-			tree = expand(config["output_dir"] + "{lineages}/" + "iqtree.nwk", lineages = config["lineages"]),
-			annotations = expand(config["output_dir"] + "{lineages}/" + "{lineages}" + "_phylo_tree.pdf", lineages = config["lineages"])
-
-elif not config["qc_list"]:
-	rule all: 
-		input: 
-			gisaid_subset = expand(config["output_dir"] + "{lineages}/" + "gisaid_subset_filtered.fa", lineages = config["lineages"]),
-			pho_subset = expand(config["output_dir"] + "{lineages}/" + "pho_subset_filtered.fa", lineages = config["lineages"]),
-			merged = expand(config["output_dir"] + "{lineages}/" + "merged.fa", lineages = config["lineages"]),
-			gisaid_metadata = expand(config["output_dir"] + "{lineages}/" + "civet_data/" + "gisaid_subset_metadata.csv", lineages = config["lineages"]),
-			alignment = expand(config["output_dir"] + "{lineages}/" + "merged_aln.fasta", lineages = config["lineages"]),
-			tree = expand(config["output_dir"] + "{lineages}/" + "iqtree.nwk", lineages = config["lineages"])
+rule all:
+    input: 
+        gisaid_subset = expand(config["output_dir"] + "{lineages}/" + "gisaid_subset_filtered.fa", lineages = config["lineages"]),
+	pho_subset = expand(config["output_dir"] + "{lineages}/" + "pho_subset_filtered.fa", lineages = config["lineages"]),
+	merged = expand(config["output_dir"] + "{lineages}/" + "merged.fa", lineages = config["lineages"]),
+	gisaid_metadata = expand(config["output_dir"] + "{lineages}/" + "civet_data/" + "gisaid_subset_metadata.csv", lineages = config["lineages"]),
+	alignment = expand(config["output_dir"] + "{lineages}/" + "merged_aln.fasta", lineages = config["lineages"]),
+	tree = expand(config["output_dir"] + "{lineages}/" + "iqtree.nwk", lineages = config["lineages"]),
+	annotations = expand(config["output_dir"] + "{lineages}/" + "{lineages}" + "_phylo_tree.pdf", lineages = config["lineages"]) if config["qc_list"] else []
 
 
 # Create lineage subset using a shell script
@@ -100,22 +89,21 @@ rule tree:
   		--output {output} \
   		--nthreads auto"
 
-if config["qc_list"]: 
-	rule tree_annotation: 
-		input: 
-			tree = config["output_dir"] + "{lineages}/" + "iqtree.nwk",
-			qc_list = config["qc_list"]
 
-		output: 
-			config["output_dir"] + "{lineages}/" + "{lineages}" + "_phylo_tree.pdf"
-		params: 
-			lineages = "{lineages}",
-			annotation_script = srcdir("automate_tree_annotation.R"),
-			out_dir = config["output_dir"] + "{lineages}/",
-		shell: 
-			"export TZ=GMT && Rscript {params.annotation_script} \
- 			--input_tree {input.tree} \
-			--output_directory {params.out_dir} \
-			--lineage_id {params.lineages} \
-			--qc_list {input.qc_list}"
-	
+rule tree_annotation: 
+        input: 
+		tree = config["output_dir"] + "{lineages}/" + "iqtree.nwk",
+		qc_list = config["qc_list"]
+
+	output: 
+		config["output_dir"] + "{lineages}/" + "{lineages}" + "_phylo_tree.pdf"
+	params: 
+		lineages = "{lineages}",
+		annotation_script = srcdir("automate_tree_annotation.R"),
+		out_dir = config["output_dir"] + "{lineages}/",
+	shell: 
+		"export TZ=GMT && Rscript {params.annotation_script} \
+ 		--input_tree {input.tree} \
+		--output_directory {params.out_dir} \
+		--lineage_id {params.lineages} \
+		--qc_list {input.qc_list}"

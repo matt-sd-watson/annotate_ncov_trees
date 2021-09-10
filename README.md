@@ -2,6 +2,8 @@
 
 Scripts and workflow elements to automate the annotation of newick trees for COVID-19
 
+**NOTE: An updated version of this pipeline written in Nextflow can be found in development [here](https://github.com/matt-sd-watson/nextflow_for_bioinformatics/tree/main/tree_annotation)
+
 ## Installation
 
 The package requires conda to be installed in the current environment. 
